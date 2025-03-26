@@ -6,98 +6,221 @@
   <title>Real Estate Market Data</title>
   <!-- Load Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Leaflet CSS -->
+  <!-- Load Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <!-- Load Chart.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100">
-  <!-- Navigation Bar -->
+  <!-- Navigation Bar (Static content) -->
   <nav class="bg-gray-800">
     <div class="max-w-7xl mx-auto px-4">
       <div class="flex justify-between items-center h-16">
         <div class="flex items-center">
+          <!-- Site title (static text) -->
           <span class="text-white font-bold text-xl">Real Estate Data</span>
         </div>
         <div>
+          <!-- Static navigation link -->
           <a href="#" class="text-gray-300 hover:text-white px-3">Home</a>
         </div>
       </div>
     </div>
   </nav>
 
-  <!-- Hero Section -->
+  <!-- Hero Section (Static content) -->
   <section class="bg-cover bg-center h-96" style="background-image: url('https://source.unsplash.com/1600x400/?city,skyline');">
     <div class="flex items-center justify-center h-full bg-black bg-opacity-50">
       <div class="text-center">
+        <!-- Hero title (static text) -->
         <h1 class="text-white text-4xl md:text-6xl font-bold">Find Your Market Data</h1>
-        <p class="text-white mt-4 text-lg md:text-xl">Enter your location details to discover real estate market insights</p>
+        <!-- Hero subtitle (static text) -->
+        <p class="text-white mt-4 text-lg md:text-xl">Enter your location details and select a statistic to view market insights</p>
       </div>
     </div>
   </section>
 
   <!-- Main Content -->
   <main class="max-w-4xl mx-auto my-8 px-4">
-    <!-- Error Message -->
+    <!-- Error Message: Rendered if 'error' is passed from Python -->
     {% if error %}
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-      {{ error }}
-    </div>
+      <!-- Output error message from Python -->
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        {{ error }}
+      </div>
     {% endif %}
 
     <!-- Form Card -->
     <div class="bg-white shadow rounded-lg p-6 mb-6">
-      <h4 class="text-2xl font-semibold mb-4">Enter Location</h4>
+      <!-- Form title (static text) -->
+      <h4 class="text-2xl font-semibold mb-4">Enter Location & Select Statistic</h4>
       <form method="POST">
         <div class="mb-4">
+          <!-- Label for City -->
           <label for="city" class="block text-gray-700">City</label>
+          <!-- City input: Retains previous value via Python's request.form -->
           <input type="text" id="city" name="city" placeholder="Enter city" required
+                 value="{{ request.form.get('city', '') }}"
                  class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
         <div class="mb-4">
+          <!-- Label for State -->
           <label for="state" class="block text-gray-700">State (e.g., CA)</label>
+          <!-- State input: Retains previous value via Python's request.form -->
           <input type="text" id="state" name="state" placeholder="Enter two-letter state code" required
+                 value="{{ request.form.get('state', '') }}"
                  class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
         <div class="mb-4">
+          <!-- Label for Zip Code -->
           <label for="zip" class="block text-gray-700">Zip Code</label>
+          <!-- Zip input: Retains previous value via Python's request.form -->
           <input type="text" id="zip" name="zip" placeholder="Enter zip code" required
+                 value="{{ request.form.get('zip', '') }}"
                  class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
         </div>
+        <div class="mb-4">
+          <!-- Label for Statistic selection -->
+          <label for="stat" class="block text-gray-700">Select Statistic</label>
+          <!-- Dropdown for statistic selection: Selected value is retained via Python's request.form -->
+          <select id="stat" name="stat" required
+                  class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <option value="price_median" {% if request.form.get('stat') == 'price_median' %}selected{% endif %}>Price Median</option>
+            <option value="count" {% if request.form.get('stat') == 'count' %}selected{% endif %}>Count</option>
+            <option value="dom_mean" {% if request.form.get('stat') == 'dom_mean' %}selected{% endif %}>DOM Mean</option>
+            <option value="dom_median" {% if request.form.get('stat') == 'dom_median' %}selected{% endif %}>DOM Median</option>
+            <option value="age_mean" {% if request.form.get('stat') == 'age_mean' %}selected{% endif %}>Age Mean</option>
+            <option value="sqft_mean" {% if request.form.get('stat') == 'sqft_mean' %}selected{% endif %}>Sqft Mean</option>
+            <option value="per_sqft_median" {% if request.form.get('stat') == 'per_sqft_median' %}selected{% endif %}>Per Sqft Median</option>
+            <option value="lot_median" {% if request.form.get('stat') == 'lot_median' %}selected{% endif %}>Lot Median</option>
+            <option value="beds_mean" {% if request.form.get('stat') == 'beds_mean' %}selected{% endif %}>Beds Mean</option>
+            <option value="baths_mean" {% if request.form.get('stat') == 'baths_mean' %}selected{% endif %}>Baths Mean</option>
+            <option value="price_max" {% if request.form.get('stat') == 'price_max' %}selected{% endif %}>Price Max</option>
+            <option value="price_min" {% if request.form.get('stat') == 'price_min' %}selected{% endif %}>Price Min</option>
+            <option value="mai" {% if request.form.get('stat') == 'mai' %}selected{% endif %}>MAI</option>
+            <option value="new_price_median" {% if request.form.get('stat') == 'new_price_median' %}selected{% endif %}>New Price Median</option>
+            <option value="absorbed_price_median" {% if request.form.get('stat') == 'absorbed_price_median' %}selected{% endif %}>Absorbed Price Median</option>
+            <option value="absorbed_dom_median" {% if request.form.get('stat') == 'absorbed_dom_median' %}selected{% endif %}>Absorbed DOM Median</option>
+            <option value="relisted_percent" {% if request.form.get('stat') == 'relisted_percent' %}selected{% endif %}>Relisted Percent</option>
+            <option value="price_decreased_percent" {% if request.form.get('stat') == 'price_decreased_percent' %}selected{% endif %}>Price Decreased Percent</option>
+            <option value="price_increased_percent" {% if request.form.get('stat') == 'price_increased_percent' %}selected{% endif %}>Price Increased Percent</option>
+            <option value="rental_price_median" {% if request.form.get('stat') == 'rental_price_median' %}selected{% endif %}>Rental Price Median</option>
+          </select>
+        </div>
+        <!-- Submit button -->
         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
           Get Market Data
         </button>
       </form>
     </div>
 
-    <!-- Results Card -->
+    <!-- Results Card: Displayed if Python passes a 'result' dictionary -->
     {% if result %}
-    <div class="bg-white shadow rounded-lg p-6 mb-6">
-      <h4 class="text-2xl font-semibold mb-4">Results for {{ result.city }}, {{ result.state }} {{ result.zip }}</h4>
-      <p class="mb-2"><strong>Location Hash:</strong> {{ result.location_hash or "N/A" }}</p>
-      <p class="mb-2"><strong>Location URL:</strong> {{ result.location_url }}</p>
-      <p class="mb-2"><strong>Median Price:</strong> {{ result.median_price }}</p>
-    </div>
+      <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <!-- Output location info from Python -->
+        <h4 class="text-2xl font-semibold mb-4">
+          Results for 
+          {{ result.city }},   <!-- City from Python -->
+          {{ result.state }}    <!-- State from Python -->
+          {{ result.zip }}       <!-- Zip code from Python -->
+        </h4>
+        <!-- Output location hash -->
+        <p class="mb-2"><strong>Location Hash:</strong> {{ result.location_hash or "N/A" }}</p>
+        <!-- Output location URL -->
+        <p class="mb-2"><strong>Location URL:</strong> {{ result.location_url }}</p>
+        <!-- Output selected stat value -->
+        <p class="mb-2"><strong>{{ stat|capitalize }}:</strong> {{ result.stat_value }}</p>
+      </div>
     {% endif %}
 
-    <!-- Map Card -->
+    <!-- Map Card: Displayed if Python passes valid latitude and longitude -->
     {% if lat and lon %}
-    <div class="bg-white shadow rounded-lg p-6">
-      <div id="map" class="h-96 rounded-md"></div>
-    </div>
+      <div class="bg-white shadow rounded-lg p-6 mb-6">
+        <!-- Div where the Leaflet map is rendered; Python provides 'lat' and 'lon' -->
+        <div id="map" class="h-96 rounded-md"></div>
+      </div>
+    {% endif %}
+
+    <!-- Chart Card: Displayed if historical data is available inside result.history -->
+    {% if result.history and result.history|length > 0 %}
+      <div class="bg-white shadow rounded-lg p-6">
+        <!-- Canvas element for Chart.js; height set with Tailwind's h-96 to match the map -->
+        <canvas id="historyChart" class="w-full h-96 rounded-md"></canvas>
+      </div>
     {% endif %}
   </main>
 
-  <!-- Leaflet JS -->
+  <!-- Load Leaflet JS -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <!-- Initialize Leaflet Map if coordinates are provided -->
   {% if lat and lon %}
-  <script>
-    // Initialize the map centered at the geocoded location.
-    var map = L.map('map').setView([{{ lat }}, {{ lon }}], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
-    var marker = L.marker([{{ lat }}, {{ lon }}]).addTo(map);
-    marker.bindPopup('<strong>Median Price: </strong>{{ result.median_price }}').openPopup();
-  </script>
+    <script>
+      // Initialize the map with Python-provided latitude and longitude
+      var map = L.map('map').setView([{{ lat }}, {{ lon }}], 13);
+      // Add OpenStreetMap tiles
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+      // Place a marker on the map
+      var marker = L.marker([{{ lat }}, {{ lon }}]).addTo(map);
+      // Bind a popup showing the selected stat value
+      marker.bindPopup('<strong>{{ stat|capitalize }}:</strong> {{ result.stat_value }}').openPopup();
+    </script>
+  {% endif %}
+
+  <!-- Initialize Chart.js Chart if historical data is provided -->
+  {% if result.history and result.history|length > 0 %}
+    <script>
+      // Build arrays for chart labels (dates) and data (values) using Python historical data
+      const labels = [
+        {% for date, value in result.history %}
+          "{{ date }}",  // Output each date from Python
+        {% endfor %}
+      ];
+      const data = [
+        {% for date, value in result.history %}
+          {{ value }},  // Output each corresponding value from Python
+        {% endfor %}
+      ];
+
+      // Configure the Chart.js line chart
+      const config = {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '{{ stat|capitalize }} History',
+            data: data,
+            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            fill: true,
+            tension: 0.1
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              title: {
+                display: true,
+                text: 'Date'
+              }
+            },
+            y: {
+              title: {
+                display: true,
+                text: '{{ stat|capitalize }}'
+              }
+            }
+          }
+        }
+      };
+
+      // Render the chart into the canvas element with id "historyChart"
+      var myChart = new Chart(
+        document.getElementById('historyChart'),
+        config
+      );
+    </script>
   {% endif %}
 </body>
 </html>
