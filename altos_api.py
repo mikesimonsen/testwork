@@ -114,14 +114,14 @@ def fetch_altos_stat(location_hash, stat_name):
         return "N/A"
 
 
-def fetch_altos_history(location_hash, stat_name, limit=10):
+def fetch_altos_history(location_hash, stat_name, limit=153):
     """
     Fetch a longer history of a given Altos stat by increasing the limit parameter.
 
     Args:
         location_hash (str): The unique location hash from Altos.
         stat_name (str): The name of the stat to retrieve (e.g., 'price_median').
-        limit (int): The number of historical records to retrieve (default is 10).
+        limit (int): The number of historical records to retrieve (default is 153 weeks).
 
     Returns:
         dict: A dictionary where the keys are dates and values are the corresponding stat values.
@@ -133,7 +133,7 @@ def fetch_altos_history(location_hash, stat_name, limit=10):
         "quartile": 0,
         "window_size": "7D",
         "remove_null": "true",
-        "limit": limit,         # Increased limit to fetch more records.
+        "limit": limit,
         "pai": ALTOS_API_KEY,   # Ensure ALTOS_API_KEY is defined at the top of your file.
     }
     url_with_params = f"{ALTOS_DATA_API_URL}?{urlencode(params)}"
@@ -239,7 +239,7 @@ def index():
             
             # Fetch historical data using a larger limit (e.g., 20 records).
             if location_hash:
-                raw_history = fetch_altos_history(location_hash, chosen_stat, limit=20)
+                raw_history = fetch_altos_history(location_hash, chosen_stat, limit=160)
                 # Sort the history in chronological order.
                 history = sort_timeseries(raw_history)
                 print("history sorted:", history)
